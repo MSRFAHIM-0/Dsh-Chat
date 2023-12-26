@@ -1,0 +1,181 @@
+<!-- Coded By M S R -->
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>TeamDSHchatsection</title>
+    <style>
+        /* CSS styles here */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+	   	display: flex;
+	   	justify-content: center;
+	   	align-items: center;
+	   	height: 100vh;
+	   	background-color: #f4f4f4;
+        }
+
+        #chat-container {
+            display: flex;
+            flex-direction: column;
+            width: 450px;
+            height: 550px;
+            border: 1px solid #ccc;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        #chat-container header {
+            background-color: red;
+            color: #fff;
+            padding: 15px;
+            font-size: 24px;
+            text-align: center;
+        }
+
+        #message-list {
+            flex: 1;
+            overflow-y: auto;
+            padding: 15px;
+        }
+
+        .message {
+            margin-bottom: 10px;
+        }
+
+        .sender {
+            font-weight: bold;
+            margin-right: 10px;
+        }
+
+        .time {
+            color: #aaa;
+        }
+
+        #user-input {
+            display: flex;
+            background-color: #f8f8f8;
+            padding: 15px;
+        }
+
+        #message-input {
+            flex: 1;
+            border: none;
+            outline: none;
+            background-color: white;
+            font-size: 16px;
+            padding: 10px;
+            margin-right: 10px;
+        }
+
+        #send-button {
+            border: none;
+            outline: none;
+            background-color: green;
+            color: #fff;
+            font-size: 16px;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div id="chat-container">
+        <header>
+            ChatC
+        </header>
+
+        <div id="message-list"></div>
+
+        <div id="user-input">
+            <input type="text" id="message-input" placeholder="Type your message...">
+            <button id="send-button">Send</button>
+        </div>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/8.2.9/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.2.9/firebase-database.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.2.9/firebase-auth.js"></script> <!-- Add Firebase Authentication library -->
+
+    <script>
+        // Initialize Firebase
+        var firebaseConfig = {
+            apiKey: "AIzaSyAxNy9X5T7uZAw0rltNPP4g651ZBfeLRl0",
+            authDomain: "msrchatc.firebaseapp.com",
+            databaseURL: "https://msrchatc-default-rtdb.firebaseio.com",
+            projectId: "msrchatc",
+            storageBucket: "msrchatc.appspot.com",
+            messagingSenderId: "998943136555",
+            appId: "1:241705620737:1:998943136555:web:0c0f7b9bcb67397e62c36e",
+            measurementId: "G-V830E6CRSG"
+        };
+        firebase.initializeApp(firebaseConfig);
+
+        // Reference to all chat messages in the Firebase database
+        var messagesRef = firebase.database().ref('messages');
+
+        // Event listener for sending messages
+        document.getElementById('send-button').addEventListener('click', function() {
+            sendMessage();
+        });
+        document.getElementById('message-input').addEventListener('keypress', function(event) {
+            if (event.key === 'Enter') {
+                sendMessage();
+            }
+        });
+
+        // Function to send messages to the Firebase database
+        function sendMessage() {
+            var messageInput = document.getElementById('message-input');
+
+            if (messageInput.value && messageInput.value.trim()) {
+                messagesRef.push({
+                    sender: firebase.auth().currentUser ? firebase.auth().currentUser.displayName : null,
+                    text: messageInput.value.trim(),
+                    time: new Date().toLocaleTimeString()
+                });
+
+                messageInput.value = '';
+            }
+        }
+
+        // Event listener for receiving new chat messages from the Firebase database
+        messagesRef.on('child_added', function(data) {
+            var message = data.val();
+
+            var messageList = document.getElementById('message-list');
+
+            var messageDiv = document.createElement('div');
+            messageDiv.classList.add('message');
+
+            var senderSpan = document.createElement('span');
+            senderSpan.classList.add('sender');
+            senderSpan.textContent = message.sender + ': ';
+            messageDiv.appendChild(senderSpan);
+
+            var textSpan = document.createElement('span');
+            textSpan.classList.add('text');
+            textSpan.textContent = message.text;
+            messageDiv.appendChild(textSpan);
+
+            var timeSpan = document.createElement('span');
+            timeSpan.classList.add('time');
+            timeSpan.textContent = message.time;
+            messageDiv.appendChild(timeSpan);
+
+            messageList.appendChild(messageDiv);
+
+            messageList.scrollTop = messageList.scrollHeight;
+        });
+    </script>
+</body>
+</html>
+<!-- Coded By M S R -->
